@@ -8,6 +8,13 @@ require('dotenv').config();
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  next();
+});
+
 const PORT = process.env.PORT || 4000;
 
 const uri = `mongodb+srv://juaid22:${process.env.DB_PASS}@cluster0.n7cap.mongodb.net/bdfinance?retryWrites=true&w=majority`;
@@ -28,6 +35,7 @@ client.connect((err) => {
   });
 
   app.get('/getUserByEmail/:email', (req, res) => {
+    console.log(req.params);
     userCollection
       .find({ email: req.params.email })
       .toArray((err, documents) => {
@@ -56,11 +64,10 @@ client.connect((err) => {
   });
 
   app.post('/isAdmin', (req, res) => {
-    adminCollection
-      .find({ email: req.body.email })
-      .toArray((err, documents) => {
-        res.send(documents);
-      });
+    console.log(req.body);
+    adminCollection.find(req.body).toArray((err, documents) => {
+      res.send(documents);
+    });
   });
 
   console.log('connected');
